@@ -1,17 +1,21 @@
+// src/GeminiApi.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
-const apiKey = import.meta.env ? import.meta.env.REACT_APP_GEMINI_API_KEY : process.env.REACT_APP_GEMINI_API_KEY;
-console.log("API Key:", apiKey);
-const genAI = new GoogleGenerativeAI(apiKey);
 
+// Load API key from .env
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
+// Function to generate response
 export const generateGeminiResponse = async (prompt) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"  });
 
   try {
-    const result = await model.generateContent(prompt);
+    // Gemini expects prompt as an array of parts
+    const result = await model.generateContent([prompt]);
     const response = await result.response;
+    // console.log(response.text());
     return response.text();
   } catch (error) {
     console.error("Gemini API error:", error);
-    return "Sorry, something went wrong.";
+    return "❌ Gemini API failed. Please check your prompt or API key.";
   }
 };
