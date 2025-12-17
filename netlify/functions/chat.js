@@ -1,7 +1,6 @@
 // netlify/functions/chat.js
-import Groq from "@anthropic-ai/sdk";
+import Groq from "@anthropic-ai/sdk"; // or Anthropic if you use their latest SDK
 
-// Make sure you have added GROQ_API_KEY in Netlify environment variables
 const client = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
@@ -26,15 +25,13 @@ export default async function handler(req) {
       });
     }
 
-    // Groq Completions API
     const completion = await client.completions.create({
       model: "llama-3.1-8b-instant",
-      prompt: prompt,
+      prompt,
       max_tokens: 1024,
       temperature: 0.7,
     });
 
-    // Send the text back
     return new Response(
       JSON.stringify({ reply: completion.completion }),
       {
