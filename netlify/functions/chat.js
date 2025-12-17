@@ -1,6 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ apiKey: process.env.GROQ_API_KEY });
+const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export default async function handler(req) {
   try {
