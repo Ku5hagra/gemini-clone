@@ -1,13 +1,11 @@
-// netlify/functions/chat.js
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
 export default async function handler(req) {
   try {
-    const { prompt } = JSON.parse(req.body);
+    console.log("Request body:", req.body);
+
+    // remove JSON.parse
+    const { prompt } = req.body;
+
+    console.log("Prompt:", prompt);
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
@@ -16,7 +14,8 @@ export default async function handler(req) {
       max_tokens: 1024,
     });
 
-    // Return as Response object
+    console.log("Completion object:", completion);
+
     return new Response(
       JSON.stringify({ reply: completion.choices[0]?.message?.content }),
       {
@@ -26,7 +25,6 @@ export default async function handler(req) {
     );
   } catch (err) {
     console.error("Function error:", err);
-
     return new Response(JSON.stringify({ error: "LLM failed" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
