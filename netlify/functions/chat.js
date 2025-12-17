@@ -1,9 +1,6 @@
-// netlify/functions/chat.js
-import Groq from "@anthropic-ai/sdk";
+import { Anthropic } from "@anthropic-ai/sdk";
 
-const client = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const client = new Anthropic({ apiKey: process.env.GROQ_API_KEY });
 
 export default async function handler(req) {
   try {
@@ -25,21 +22,17 @@ export default async function handler(req) {
       });
     }
 
-    // Use completions API instead of chat.completions
     const completion = await client.completions.create({
       model: "llama-3.1-8b-instant",
-      prompt: prompt,
+      prompt,
       max_tokens: 1024,
       temperature: 0.7,
     });
 
-    return new Response(
-      JSON.stringify({ reply: completion.completion }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return new Response(JSON.stringify({ reply: completion.completion }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("Function error:", err);
     return new Response(
