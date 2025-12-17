@@ -1,15 +1,12 @@
 // netlify/functions/chat.js
-
 import Groq from "@anthropic-ai/sdk";
 
-// Initialize Groq/Anthropic client with API key from environment variable
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY, // Make sure you set this in Netlify environment variables
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 export default async function handler(req) {
   try {
-    // Only allow POST requests
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
@@ -17,7 +14,6 @@ export default async function handler(req) {
       });
     }
 
-    // Get raw body and parse JSON
     const bodyText = await req.text();
     const body = bodyText ? JSON.parse(bodyText) : {};
     const { prompt } = body;
@@ -29,17 +25,16 @@ export default async function handler(req) {
       });
     }
 
-    // Call Groq/LLM API
-    const completion = await groq.chat.completions.create({
+    // Use completions API instead of chat.completions
+    const completion = await client.completions.create({
       model: "llama-3.1-8b-instant",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      prompt: prompt,
       max_tokens: 1024,
+      temperature: 0.7,
     });
 
-    // Return the completion text
     return new Response(
-      JSON.stringify({ reply: completion.choices[0]?.message?.content || "" }),
+      JSON.stringify({ reply: completion.completion }),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
